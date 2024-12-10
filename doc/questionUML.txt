@@ -1,2 +1,55 @@
 Ecrire ici votre réponse à la question UML.
 
+
+Approche alternative de l'uml (autre ingénieur)
+1) Approche par héritage et spécialisation
+Principe :
+    On utilise une classe de base `Event` et on crée des sous-classes pour chaque variation
+    (ex : `RepetitiveEvent`, `FixedTerminationEvent`) qui intègrent directement la logique
+    de répétition et de terminaison.
+
+- Avantages :
+    * Clarté conceptuelle : On comprend facilement le rôle de chaque classe spécialisée.
+
+    * Simplicité d’utilisation : Le code client instancie directement la sous-classe correspondant
+    au besoin (par exemple un `RepetitiveEvent`) sans gérer d’autres objets.
+
+    * Héritage direct : Les attributs communs (`title`, `start`, `duration`) sont dans la superclasse,
+    et chaque sous-classe ajoute ses fonctionnalités propres.
+
+- Inconvénients :
+    * Rigidité de la hiérarchie : Ajouter un nouveau type de répétition ou de fin d’événement
+       nécessite de créer une nouvelle sous-classe.
+
+    * Complexité croissante : De multiples combinaisons (répétition + exception + termination)
+       peuvent engendrer une explosion du nombre de classes (ex : `WeeklyEventWithEndDate`).
+
+    * Couplage fort : La logique de répétition/termination est figée dans l’arborescence de classes,
+       limitant la flexibilité et la réutilisation en dehors de cette structure.
+
+Approche du TP (agenda.mdj)
+2) Approche par composition
+Principe :
+   La classe `Event` délègue la gestion de la répétition et de la fin à d’autres classes (`Repetition`,
+   `Termination`). On compose l’événement de plusieurs objets plutôt que de créer une nouvelle sous-classe.
+
+   - Avantages :
+     * Modularité et flexibilité : On peut réutiliser la logique de répétition/termination avec différents
+       types d’événements et introduire de nouvelles variantes sans multiplier les sous-classes.
+
+     * Responsabilité unique : Chaque classe a un rôle clair, ce qui respecte les principes SOLID.
+
+     * Évolution facilitée : Il est simple d’ajouter une nouvelle stratégie de fin d’événement ou
+       une nouvelle règle de répétition sans toucher à la structure de base.
+
+   - Inconvénients :
+     * Complexité initiale plus élevée : Plus de classes, plus de relations, donc une compréhension
+       initiale plus difficile.
+
+     * Configuration plus verbeuse : L’utilisateur doit créer un `Event` puis lui associer un
+       `Repetition` et éventuellement une `Termination`, ce qui complique un peu l’instanciation.
+
+
+Donc la solution basée sur l’héritage est plus simple et intuitive dans un contexte stable et peu diversifié.
+La solution par composition est plus flexible et maintenable à long terme, au prix d’une complexité
+initiale plus importante.
