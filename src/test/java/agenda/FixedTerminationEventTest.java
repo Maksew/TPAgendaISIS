@@ -64,7 +64,7 @@ public class FixedTerminationEventTest {
             "Cet événement a lieu le jour de sa terminaison");
     }
 
-    
+
     @Test
     public void eventIsInItsStartDay() {
         assertTrue(fixedTermination.isInDay(nov_1_2020),
@@ -102,4 +102,63 @@ public class FixedTerminationEventTest {
             "Cet événement ne se produit pas à W+4");
     }
 
+    @Test
+    public void setMultipleTerminations() {
+        Event multipleTerminations = new Event("Multiple terminations", nov_1__2020_22_30, min_120);
+        multipleTerminations.setRepetition(ChronoUnit.WEEKS);
+
+        // Première terminaison avec date
+        multipleTerminations.setTermination(jan_5_2021);
+        assertEquals(10, multipleTerminations.getNumberOfOccurrences(),
+                "Le nombre d'occurrences doit être correct après la première terminaison");
+
+        // Changement pour terminaison avec nombre d'occurrences
+        multipleTerminations.setTermination(5);
+        assertEquals(5, multipleTerminations.getNumberOfOccurrences(),
+                "Le nombre d'occurrences doit être mis à jour");
+
+        // Retour à une terminaison avec date
+        LocalDate newEndDate = nov_1_2020.plusWeeks(3);
+        multipleTerminations.setTermination(newEndDate);
+        assertEquals(newEndDate, multipleTerminations.getTerminationDate(),
+                "La date de terminaison doit être mise à jour");
+    }
+
+    @Test
+    public void differentFrequencies() {
+        // Test avec répétition journalière
+        Event dailyEvent = new Event("Daily Event", nov_1__2020_22_30, min_120);
+        dailyEvent.setRepetition(ChronoUnit.DAYS);
+        dailyEvent.setTermination(5);
+        assertTrue(dailyEvent.isInDay(nov_1_2020.plusDays(3)),
+                "L'événement doit se produire 3 jours après");
+
+        // Test avec répétition mensuelle
+        Event monthlyEvent = new Event("Monthly Event", nov_1__2020_22_30, min_120);
+        monthlyEvent.setRepetition(ChronoUnit.MONTHS);
+        monthlyEvent.setTermination(3);
+        assertTrue(monthlyEvent.isInDay(nov_1_2020.plusMonths(2)),
+                "L'événement doit se produire 2 mois après");
+    }
+
+    @Test
+    public void multipleExceptions() {
+        Event eventWithExceptions = new Event("Event with exceptions", nov_1__2020_22_30, min_120);
+        eventWithExceptions.setRepetition(ChronoUnit.WEEKS);
+        eventWithExceptions.setTermination(5);
+
+        // Ajouter plusieurs exceptions
+        LocalDate exception1 = nov_1_2020.plusWeeks(1);
+        LocalDate exception2 = nov_1_2020.plusWeeks(2);
+        eventWithExceptions.addException(exception1);
+        eventWithExceptions.addException(exception2);
+
+        // Vérifier les exceptions
+        assertFalse(eventWithExceptions.isInDay(exception1),
+                "L'événement ne doit pas se produire le jour de la première exception");
+        assertFalse(eventWithExceptions.isInDay(exception2),
+                "L'événement ne doit pas se produire le jour de la deuxième exception");
+        assertTrue(eventWithExceptions.isInDay(nov_1_2020.plusWeeks(3)),
+                "L'événement doit se produire un jour sans exception");
+    }
 }

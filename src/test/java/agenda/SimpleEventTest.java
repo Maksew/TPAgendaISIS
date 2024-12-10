@@ -7,8 +7,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * Teste des événements simples, sans répétition
  */
@@ -54,6 +54,60 @@ public class SimpleEventTest {
     public void toStringShowsEventTitle() {
         assertTrue(simple.toString().contains("Simple event"),
             "toString() doit montrer le titre de l'événement");
+    }
+
+    @Test
+    public void gettersWork() {
+        assertEquals("Simple event", simple.getTitle(), "getTitle doit retourner le titre correct");
+        assertEquals(nov_1_2020_22_30, simple.getStart(), "getStart doit retourner le début correct");
+        assertEquals(min_89, simple.getDuration(), "getDuration doit retourner la durée correcte");
+    }
+
+    @Test
+    public void getNumberOfOccurrencesReturnOneForSimpleEvent() {
+        assertEquals(1, simple.getNumberOfOccurrences(),
+                "Un événement simple doit avoir une seule occurrence");
+    }
+
+    @Test
+    public void getTerminationDateReturnsStartDateForSimpleEvent() {
+        assertEquals(nov_1_2020, simple.getTerminationDate(),
+                "La date de fin d'un événement simple doit être sa date de début");
+    }
+
+    @Test
+    public void toStringShowsAllAttributes() {
+        String eventString = simple.toString();
+        assertTrue(eventString.contains("Simple event"), "toString doit contenir le titre");
+        assertTrue(eventString.contains(nov_1_2020_22_30.toString()), "toString doit contenir la date de début");
+        assertTrue(eventString.contains(min_89.toString()), "toString doit contenir la durée");
+    }
+
+    @Test
+    public void exactlyOneDayEvent() {
+        LocalDateTime start = LocalDate.of(2020, 11, 1).atStartOfDay();
+        Event dayEvent = new Event("24h Event", start, Duration.ofHours(24));
+
+        assertTrue(dayEvent.isInDay(LocalDate.of(2020, 11, 1)),
+                "L'événement doit être dans son jour de début");
+        assertTrue(dayEvent.isInDay(LocalDate.of(2020, 11, 2)),
+                "L'événement de 24h doit être aussi dans le jour suivant");
+    }
+
+    @Test
+    public void zeroMinutesEvent() {
+        Event instantEvent = new Event("Zero Duration", nov_1_2020_22_30, Duration.ZERO);
+        assertTrue(instantEvent.isInDay(nov_1_2020),
+                "Un événement de durée zéro doit être détecté dans son jour");
+        assertFalse(instantEvent.isInDay(nov_1_2020.plusDays(1)),
+                "Un événement de durée zéro ne doit pas déborder sur le jour suivant");
+    }
+
+    @Test
+    public void addExceptionToSimpleEvent() {
+        simple.addException(nov_1_2020);
+        assertTrue(simple.isInDay(nov_1_2020),
+                "Les exceptions ne doivent pas affecter un événement simple");
     }
     
 }

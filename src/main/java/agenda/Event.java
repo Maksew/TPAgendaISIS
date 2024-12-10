@@ -73,7 +73,8 @@ public class Event {
         LocalDateTime end = myStart.plus(myDuration);
         LocalDateTime dayStart = aDay.atStartOfDay();
         LocalDateTime dayEnd = aDay.plusDays(1).atStartOfDay();
-        boolean isInDay = myStart.isBefore(dayEnd) && end.isAfter(dayStart);
+        boolean isInDay = myStart.isBefore(dayEnd) &&
+                (end.isAfter(dayStart) || end.equals(dayStart));
 
         if (repetition == null) {
             return isInDay;
